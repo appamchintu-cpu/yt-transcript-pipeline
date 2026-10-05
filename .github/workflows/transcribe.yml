@@ -1,0 +1,41 @@
+name: YouTube Transcript Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      history_json:
+        description: "Base64-encoded youtube_history_today.json content"
+        required: true
+        type: string
+
+jobs:
+  transcribe:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install youtube-transcript-api
+
+      - name: Decode and write history JSON
+        run: |
+          echo "${{ github.event.inputs.history_json }}" | base64 -d > youtube_history_today.json
+          echo "History file written:"
+          cat youtube_history_today.json | python3 -c "import sys,json; data=json.load(sys.stdin); print(f'Total items: {len(data)}')"
+
+      - name: Run transcript fetcher
+        run: python3 fetch_transcripts.py
+
+      - name: Upload transcript output as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtube-transcripts-today
+          path: youtube_transcripts_today.md
+          retention-days: 7
