@@ -21,8 +21,13 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install dependencies (yt-dlp)
-        run: pip install yt-dlp
+      - name: Set up Deno (JS runtime for yt-dlp)
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Install dependencies (yt-dlp & secretstorage)
+        run: pip install "yt-dlp[default]" pycryptodome
 
       - name: Decode and write history JSON
         run: |

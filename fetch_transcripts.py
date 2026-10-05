@@ -51,18 +51,23 @@ def fetch_transcript_ytdlp(url, output_dir):
             "yt-dlp",
             "--write-auto-subs",
             "--write-subs",
-            "--sub-lang", "en,hi,te,es,fr,de",
+            "--sub-lang", "en.*,en,hi,te,es,fr,de",
             "--skip-download",
             "--sub-format", "vtt",
-            "--extractor-args", "youtube:player_client=android",
+            "--verbose",
             "--output", os.path.join(output_dir, "%(id)s"),
             clean_url
         ]
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
         
+        print(f"--- yt-dlp stdout for {clean_url} ---")
+        print(result.stdout)
+        print(f"--- yt-dlp stderr for {clean_url} ---")
+        print(result.stderr)
+        
         vtt_files = [os.path.join(output_dir, f) for f in os.listdir(output_dir) if f.endswith(".vtt")]
         if not vtt_files:
-            return None, f"No subtitles found via yt-dlp. (stderr: {result.stderr.strip()[-150:]})"
+            return None, f"No subtitles found via yt-dlp. (stderr: {result.stderr.strip()[-200:]})"
         
         vtt_path = vtt_files[0]
         text = parse_vtt(vtt_path)
