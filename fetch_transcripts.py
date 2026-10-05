@@ -44,7 +44,7 @@ def fetch_transcript_ytdlp(url, output_dir):
         
         vtt_files = [os.path.join(output_dir, f) for f in os.listdir(output_dir) if f.endswith(".vtt")]
         if not vtt_files:
-            return None, f"No subtitles found via yt-dlp."
+            return None, "This video does not have closed captions or auto-generated subtitles available on YouTube."
         
         vtt_path = vtt_files[0]
         text = parse_vtt(vtt_path)
