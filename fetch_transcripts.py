@@ -8,6 +8,22 @@ import os
 import re
 import subprocess
 import sys
+import urllib.parse
+
+def extract_video_url(url):
+    """Clean the YouTube URL to base video URL without extra query params."""
+    try:
+        parsed = urllib.parse.urlparse(url)
+        if "youtu.be" in parsed.netloc:
+            vid = parsed.path.lstrip("/")
+            return f"https://www.youtube.com/watch?v={vid}"
+        query = urllib.parse.parse_qs(parsed.query)
+        if "v" in query:
+            vid = query["v"][0]
+            return f"https://www.youtube.com/watch?v={vid}"
+    except:
+        pass
+    return url
 
 def parse_vtt(vtt_path):
     """Parse a WebVTT subtitle file into clean plain text."""
@@ -29,6 +45,7 @@ def parse_vtt(vtt_path):
 
 def fetch_transcript_ytdlp(url, output_dir):
     """Use yt-dlp to download auto-subtitles for a YouTube video."""
+    clean_url = extract_video_url(url)
     try:
         cmd = [
             "yt-dlp",
@@ -38,13 +55,13 @@ def fetch_transcript_ytdlp(url, output_dir):
             "--skip-download",
             "--sub-format", "vtt",
             "--output", os.path.join(output_dir, "%(id)s"),
-            url
+            clean_url
         ]
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
         
         vtt_files = [os.path.join(output_dir, f) for f in os.listdir(output_dir) if f.endswith(".vtt")]
         if not vtt_files:
-            return None, "This video does not have closed captions or auto-generated subtitles available on YouTube."
+            return None, f"No subtitles found via yt-dlp. (stderr: {result.stderr.strip()[-150:]})"
         
         vtt_path = vtt_files[0]
         text = parse_vtt(vtt_path)
