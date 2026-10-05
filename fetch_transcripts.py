@@ -54,6 +54,7 @@ def fetch_transcript_ytdlp(url, output_dir):
             "--sub-lang", "en,hi,te,es,fr,de",
             "--skip-download",
             "--sub-format", "vtt",
+            "--extractor-args", "youtube:player_client=android",
             "--output", os.path.join(output_dir, "%(id)s"),
             clean_url
         ]
