@@ -19,10 +19,8 @@ def parse_vtt(vtt_path):
     with open(vtt_path, "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
-            # Skip WebVTT header, timestamps, cue numbers, and empty lines
             if not line or line.startswith("WEBVTT") or "-->" in line or line.isdigit():
                 continue
-            # Remove HTML tags like <c> or </c>
             line = re.sub(r'<[^>]+>', '', line)
             if line not in seen:
                 seen.add(line)
@@ -32,7 +30,6 @@ def parse_vtt(vtt_path):
 def fetch_transcript_ytdlp(url, output_dir):
     """Use yt-dlp to download auto-subtitles for a YouTube video."""
     try:
-        # Run yt-dlp to download auto-subs or manual subs in English
         cmd = [
             "yt-dlp",
             "--write-auto-subs",
@@ -45,16 +42,13 @@ def fetch_transcript_ytdlp(url, output_dir):
         ]
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
         
-        # Look for generated .vtt files in output_dir
         vtt_files = [os.path.join(output_dir, f) for f in os.listdir(output_dir) if f.endswith(".vtt")]
         if not vtt_files:
-            return None, f"No subtitles found via yt-dlp. (stderr: {result.stderr.strip()[-200:]})"
+            return None, f"No subtitles found via yt-dlp."
         
-        # Pick the most recent or matching vtt file
         vtt_path = vtt_files[0]
         text = parse_vtt(vtt_path)
         
-        # Clean up vtt files
         for f in vtt_files:
             try:
                 os.remove(f)
@@ -104,7 +98,6 @@ def main():
         
         transcript, error = fetch_transcript_ytdlp(url, temp_dir)
         
-        # Clean temp dir
         try:
             for f in os.listdir(temp_dir):
                 os.remove(os.path.join(temp_dir, f))
