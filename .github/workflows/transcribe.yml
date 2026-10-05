@@ -21,8 +21,8 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
-        run: pip install youtube-transcript-api
+      - name: Install dependencies (yt-dlp)
+        run: pip install yt-dlp
 
       - name: Decode and write history JSON
         run: |
@@ -30,7 +30,7 @@ jobs:
           echo "History file written:"
           cat youtube_history_today.json | python3 -c "import sys,json; data=json.load(sys.stdin); print(f'Total items: {len(data)}')"
 
-      - name: Run transcript fetcher
+      - name: Run transcript fetcher (yt-dlp)
         run: python3 fetch_transcripts.py
 
       - name: Upload transcript output as artifact
