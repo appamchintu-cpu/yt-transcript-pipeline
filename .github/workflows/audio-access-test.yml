@@ -12,7 +12,6 @@ jobs:
       - run: pip install "yt-dlp[default]"
       - name: Test YouTube audio download (no transcription/API)
         run: |
-          set -o pipefail
-          yt-dlp --no-warnings --format "bestaudio[filesize<20M]/bestaudio" --output /tmp/audio-test.%(ext)s --print "after_move:filepath" https://www.youtube.com/watch?v=aqz-KE-bpKQ
-          test -s /tmp/audio-test.*
-          ls -lh /tmp/audio-test.*
+          yt-dlp --no-warnings --format "bestaudio[filesize<20M]/bestaudio" --output "/tmp/audio-test.%(ext)s" https://www.youtube.com/watch?v=aqz-KE-bpKQ
+          python -c "from pathlib import Path; files=list(Path('/tmp').glob('audio-test.*')); assert files and files[0].stat().st_size > 0; print('Downloaded bytes:', files[0].stat().st_size)"
+  
