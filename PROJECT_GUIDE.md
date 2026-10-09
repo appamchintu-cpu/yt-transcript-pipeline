@@ -34,38 +34,41 @@ A future extension could send structured transcript records to Make.com or n8n f
 
 ## The second-brain idea
 
-A second brain for an AI agent means feeding it the videos and transcript content you watch each day, so it can consult that personal knowledge later. Instead of guessing from general knowledge, the agent could retrieve the relevant video and use its transcript to answer questions about something you watched—giving a precise response grounded in your viewing material and tailored to your expectations.
+Imagine being able to ask your AI agent, “What was that video I watched about local AI?” and get an answer from the actual video transcript—not a guess. That’s the goal of the second-brain idea: build a searchable library from the videos you watch, then let your agent use it to answer questions and notice patterns that matter to you.
 
-One possible future bootstrap step is for the agent to examine accumulated watch history, discover themes and categories that fit the actual content (rather than relying on a fixed taxonomy), and create a personalized query skill or command. Later, you could ask about a topic from a video and have the agent answer from your stored transcript collection. This is a product vision, not a capability implemented by the current script.
+The transcript-fetching script in this repository is the first step. The agent integration and custom “YouTube History” skill are not built yet. If your AI agent supports local files and custom skills, give it the prompt below to help set them up.
 
-### Agent setup prompt (copy into your AI agent)
+### Setup prompt for your AI agent
+
+Copy the text below into the AI agent you want to use with your transcript collection:
 
 ```text
-Help me turn my local YouTube watch-history and transcript files into a private, searchable second brain, then create a custom reusable skill/command named “YouTube History” (or the closest supported equivalent in this agent).
+I want to create a private, searchable “YouTube History” second brain from my own watch-history and transcript files. Help me set it up as a reusable skill or command in this AI agent, if supported.
 
-First, inspect what capabilities this agent supports for local files, persistent knowledge/search, and creating skills. Explain the proposed files/data you will read and where you would write the skill. Ask for my approval before accessing private watch-history/transcript data or creating/modifying files. Never ask me to paste passwords, cookies, access tokens, or webhook secrets.
+Before doing anything, explain what files you propose to inspect and where you would create the skill or index. Ask me to approve access to my files and creation or modification of files. Do not ask me for passwords, browser cookies, API keys, or webhook secrets.
 
-Use only the local history and transcript files I approve as evidence about what I watched. Do not infer viewing activity from general knowledge or silently browse the web to fill gaps. If a transcript is missing or incomplete, say so. Keep source references (video title, URL, watch date/time when available, and transcript filename/section) so answers can be traced back to the relevant item.
+After I approve, use only the history and transcript files I specifically approve to determine what I watched. Do not guess from general knowledge, and do not search the web to fill gaps unless I explicitly ask for outside research. If a transcript is missing, incomplete, or unclear, tell me.
 
-After approval, inspect the supplied records and transcripts. Discover recurring topics, categories, formats, and interests from the actual data instead of imposing a rigid taxonomy. Summarize the structure you found and ask me to correct it before encoding it into the skill. Do not assume that a category such as “useful,” “entertainment,” or “doom-scrolling” is objective; ask how I want those defined.
+Look through the approved records and discover recurring topics, interests, and useful categories from the actual content. Do not force a preset category system. Show me the patterns you found and let me correct them before creating the skill. Ask me how I want subjective labels such as “useful” or “doom-scrolling” defined; do not treat those labels as objective facts.
 
-Create a concise custom skill/command that can:
-1. Bootstrap or refresh its understanding of the local watch-history/transcript collection and adapt its organization as new data arrives.
-2. Answer questions about videos I watched, topics covered, takeaways, and interests, grounding each answer in specific video/transcript references. If evidence is insufficient, clearly say so rather than guessing.
-3. Optionally summarize viewing patterns (for example, Shorts versus long-form or topic distribution) only when the available metadata supports it, explaining assumptions and uncertainty.
+Then create a reusable skill/command, preferably called “YouTube History”, that lets me:
+- Ask what a watched video covered, find videos about a topic, and explore themes in my viewing.
+- Get answers grounded in specific transcripts, with the video title and URL (and watch date/time when available) cited as sources.
+- See when the available transcripts do not contain enough information, instead of receiving a guessed answer.
+- Optionally request viewing-pattern summaries, such as topics or Shorts versus long-form, only when the records contain enough evidence; explain assumptions and uncertainty.
 
-The skill should prefer the approved local knowledge source for questions about my watch history. It may use outside sources only when I explicitly ask for broader research, and it must distinguish external information from transcript-grounded facts. Preserve privacy: keep data and skill local/private by default, do not transmit it to a webhook, Make.com, n8n, or any cloud service unless I separately approve the exact destination, payload, and handling. Do not modify or delete my original history/transcript files.
+Keep the skill and data local/private by default. Do not send them to a webhook, Make.com, n8n, or another cloud service unless I separately approve the exact destination and data to be sent. Do not alter or delete my original history or transcript files.
 
-When finished, tell me exactly which files were read and created/changed, how to invoke the new skill, what data limitations remain, and whether any network access occurred. Do not claim the second brain is ready unless the agent can actually search the approved records and the new skill has been verified.
+When done, explain how I invoke the skill, which files you read and created, what the skill can and cannot answer, and whether you used any network access. Do not say setup is complete unless you verified the skill can find and cite entries from my approved transcript collection.
 ```
 
-### Capabilities the resulting skill is intended to support
+### What the custom skill should help you do
 
-- **Bootstrap and pattern discovery:** infer useful groupings from the user's own history, review those patterns with the user, and encode the agreed approach into a personalized agent skill.
-- **Query and interest mapping:** find relevant watched videos and answer questions using their transcripts and metadata, with traceable references and honest uncertainty.
-- **Viewing-pattern summaries:** explore the mix of educational, entertainment, or Shorts content. Any classification should be transparent and based on real data; “doom-scroll” is only one possible user-defined lens.
+- **Build itself around your data:** notice recurring topics and create an organization that fits the videos you actually watch, rather than imposing fixed categories.
+- **Ask questions about your viewing:** find relevant videos and answer from their transcripts, citing the source and acknowledging gaps.
+- **Explore viewing habits:** optionally summarize topics, formats, or Shorts versus long-form. Treat subjective labels as your choice and explain any assumptions.
 
-These capabilities require an agent-side knowledge store/search layer in addition to this transcript fetcher; they are a prompt/specification for an agent to implement with user approval, not functionality currently built into this repository.
+This is a guide for an AI agent to perform a setup with your approval—not an automatic feature of the transcript script. The agent may need its own local search/index or knowledge store to make a large transcript collection searchable.
 
 ## Privacy and security
 
