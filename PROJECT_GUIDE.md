@@ -38,13 +38,34 @@ A second brain for an AI agent means feeding it the videos and transcript conten
 
 One possible future bootstrap step is for the agent to examine accumulated watch history, discover themes and categories that fit the actual content (rather than relying on a fixed taxonomy), and create a personalized query skill or command. Later, you could ask about a topic from a video and have the agent answer from your stored transcript collection. This is a product vision, not a capability implemented by the current script.
 
-Possible future directions:
+### Agent setup prompt (copy into your AI agent)
 
-- **Bootstrap and pattern discovery:** infer useful groupings from the user's own history and help generate a personalized agent skill.
-- **Query and interest mapping:** find relevant watched videos and answer questions using their transcripts and metadata.
+```text
+Help me turn my local YouTube watch-history and transcript files into a private, searchable second brain, then create a custom reusable skill/command named “YouTube History” (or the closest supported equivalent in this agent).
+
+First, inspect what capabilities this agent supports for local files, persistent knowledge/search, and creating skills. Explain the proposed files/data you will read and where you would write the skill. Ask for my approval before accessing private watch-history/transcript data or creating/modifying files. Never ask me to paste passwords, cookies, access tokens, or webhook secrets.
+
+Use only the local history and transcript files I approve as evidence about what I watched. Do not infer viewing activity from general knowledge or silently browse the web to fill gaps. If a transcript is missing or incomplete, say so. Keep source references (video title, URL, watch date/time when available, and transcript filename/section) so answers can be traced back to the relevant item.
+
+After approval, inspect the supplied records and transcripts. Discover recurring topics, categories, formats, and interests from the actual data instead of imposing a rigid taxonomy. Summarize the structure you found and ask me to correct it before encoding it into the skill. Do not assume that a category such as “useful,” “entertainment,” or “doom-scrolling” is objective; ask how I want those defined.
+
+Create a concise custom skill/command that can:
+1. Bootstrap or refresh its understanding of the local watch-history/transcript collection and adapt its organization as new data arrives.
+2. Answer questions about videos I watched, topics covered, takeaways, and interests, grounding each answer in specific video/transcript references. If evidence is insufficient, clearly say so rather than guessing.
+3. Optionally summarize viewing patterns (for example, Shorts versus long-form or topic distribution) only when the available metadata supports it, explaining assumptions and uncertainty.
+
+The skill should prefer the approved local knowledge source for questions about my watch history. It may use outside sources only when I explicitly ask for broader research, and it must distinguish external information from transcript-grounded facts. Preserve privacy: keep data and skill local/private by default, do not transmit it to a webhook, Make.com, n8n, or any cloud service unless I separately approve the exact destination, payload, and handling. Do not modify or delete my original history/transcript files.
+
+When finished, tell me exactly which files were read and created/changed, how to invoke the new skill, what data limitations remain, and whether any network access occurred. Do not claim the second brain is ready unless the agent can actually search the approved records and the new skill has been verified.
+```
+
+### Capabilities the resulting skill is intended to support
+
+- **Bootstrap and pattern discovery:** infer useful groupings from the user's own history, review those patterns with the user, and encode the agreed approach into a personalized agent skill.
+- **Query and interest mapping:** find relevant watched videos and answer questions using their transcripts and metadata, with traceable references and honest uncertainty.
 - **Viewing-pattern summaries:** explore the mix of educational, entertainment, or Shorts content. Any classification should be transparent and based on real data; “doom-scroll” is only one possible user-defined lens.
 
-These ideas would need an agent-side knowledge store/search layer in addition to this transcript fetcher.
+These capabilities require an agent-side knowledge store/search layer in addition to this transcript fetcher; they are a prompt/specification for an agent to implement with user approval, not functionality currently built into this repository.
 
 ## Privacy and security
 
