@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+*.vtt
+temp_subs_*/
+# Personal/local data; do not commit watch history or generated transcripts.
+youtube_history_today.json
+youtube_transcripts_today.md
