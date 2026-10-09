@@ -1,20 +1,18 @@
 # Watch History Agent
 
-Turn the YouTube videos you watch into a personal library of transcripts—and, over time, a searchable second brain for your AI agent.
+I wanted a simple way to keep the useful parts of the YouTube videos I watch: the words, not another pile of downloaded video files. This project takes a list of YouTube links, fetches captions with yt-dlp, and gives you the transcript in your terminal and in a Markdown file.
 
-**Right now:** give the script a JSON file of video links. It uses yt-dlp to fetch available captions, prints the transcript, and saves a Markdown report. It does not download video/audio, read your browser history automatically, or send anything to a webhook.
+That transcript collection could later become a searchable second brain for an AI agent. The agent could help you find a video you half-remember, revisit an idea, or spot topics that keep showing up in your watch history. That part still needs to be set up in an agent; this repo currently fetches and displays transcripts.
 
-> The second-brain and custom-agent-skill features described below are a vision and setup prompt. They are not built into the current script yet.
+## Run it locally
 
-## Try it out
-
-You need Python 3 and yt-dlp. Install the dependency:
+You’ll need Python 3 and yt-dlp. Install the dependency from the project folder:
 
 ```bash
 python3 -m pip install -r requirements.txt
 ```
 
-Create `youtube_history_today.json` in the project directory:
+Create a file called `youtube_history_today.json` beside the script. Add the videos you want to process:
 
 ```json
 [
@@ -32,38 +30,40 @@ Then run:
 python3 fetch_transcripts.py
 ```
 
-You’ll see progress and any retrieved transcript text in the terminal. The full report is saved as `youtube_transcripts_today.md`. The sample above is only a format example; replace it with your own video information.
+The script prints each transcript as it retrieves it and saves a copy to `youtube_transcripts_today.md`. If a video has no accessible captions, it says so in the report.
 
-## What to expect
+## A few things to know
 
-- The script processes links you provide; it does not sign in to YouTube or collect your watch history for you.
-- It asks yt-dlp for subtitles only (`--skip-download`), never video or audio.
-- Captions may be missing, unavailable in the requested languages, or rate-limited by YouTube.
-- Your history file and generated transcript report are excluded from Git by default. Keep them private unless you choose to share them.
-- There is no webhook, Make.com/n8n connection, or AI memory integration in the current code.
+- You provide the video list. The script doesn’t sign in to YouTube or collect your watch history from the browser.
+- yt-dlp fetches subtitle files only. The command includes `--skip-download`, so it does not download video or audio.
+- Captions aren’t available for every video. YouTube can also limit requests, and language availability varies.
+- Your history and transcript files are ignored by Git so they’re less likely to end up in a commit by accident. Still, treat them as private and check before sharing them.
+- There’s no webhook or Make.com/n8n connection in the code today.
 
-## The longer-term idea
+## Turning it into a second brain
 
-With an agent that can access your local transcript files, you could ask it to build a custom “YouTube History” skill. The agent would discover themes in your actual watch history, help organize the material, and let you ask later what a video covered or what you’ve been watching. See [PROJECT_GUIDE.md](PROJECT_GUIDE.md) for a ready-to-copy setup prompt and the full vision. That requires agent-side setup; this repository currently only fetches and displays transcripts.
+The longer-term idea is to give an AI agent access to your transcript library and ask it to make a personal “YouTube History” skill. That skill could help you find videos by topic and answer questions from the transcripts you actually watched, rather than guessing. The setup prompt and more detail are in [PROJECT_GUIDE.md](PROJECT_GUIDE.md). The agent integration isn’t included in the current script.
 
-A future version could also connect to Make.com or n8n for automation, but no webhook is implemented here today.
+You could also build an automation with Make.com or n8n later. Nothing is sent to those services by this project now.
 
 ## Tests
+
+Run the offline tests with:
 
 ```bash
 python3 -m unittest discover -s tests -v
 ```
 
-The tests are offline and do not contact YouTube.
+They use a mocked yt-dlp call, so they don’t contact YouTube.
 
 ## GitHub Actions
 
-An optional manual workflow can process history JSON in GitHub Actions and save the transcript report as an artifact. This sends the supplied data to GitHub’s cloud environment; use it only if you are comfortable with that. It does not send a webhook.
-
-## Project guide
-
-See [PROJECT_GUIDE.md](PROJECT_GUIDE.md) for the agent setup prompt, second-brain concept, privacy notes, and future ideas.
+There’s also a manual GitHub Actions workflow. It runs in GitHub’s cloud, takes the history JSON you provide, and makes the transcript report available as an artifact. That means your submitted history is processed outside your computer; only use the workflow if you’re comfortable with that.
 
 ## License
 
-No license has been specified.
+This repository doesn’t have a license yet.
+
+## More detail
+
+See [PROJECT_GUIDE.md](PROJECT_GUIDE.md) for the second-brain setup prompt, privacy notes, and ideas for what an agent skill could do.

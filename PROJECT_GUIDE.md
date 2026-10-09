@@ -1,10 +1,12 @@
-# Project Guide: YouTube Watch History as an AI Second Brain
+# Project guide: a second brain for your YouTube history
 
-## Current implementation
+## What this project does today
 
-The script reads a local JSON list of video entries, skips Shorts, and uses yt-dlp with media downloading disabled to fetch available caption files. It displays transcript text in the terminal and writes a Markdown report. It does not log in to YouTube, inspect browser profiles, obtain your account history by itself, send webhooks, or create an AI knowledge base.
+Give the script a list of YouTube links. It asks yt-dlp for captions, prints any transcript it can retrieve, and saves a Markdown report. It does not sign in to your account, collect watch history from your browser, or send anything to a webhook.
 
-### Local use
+The code only asks for subtitle files. It uses yt-dlp's `--skip-download` option, so it does not download video or audio.
+
+## Try it locally
 
 Install yt-dlp:
 
@@ -12,7 +14,7 @@ Install yt-dlp:
 python3 -m pip install -r requirements.txt
 ```
 
-Create `youtube_history_today.json` in the project root, for example:
+In the project folder, create `youtube_history_today.json` with the videos you want to process:
 
 ```json
 [
@@ -20,84 +22,74 @@ Create `youtube_history_today.json` in the project root, for example:
 ]
 ```
 
-Then run:
+Run the script:
 
 ```sh
 python3 fetch_transcripts.py
 ```
 
-Transcript text is printed and saved to `youtube_transcripts_today.md`. If captions are missing or unavailable, the report says so. Caption availability, language, and rate limits affect results. The script downloads no media.
-
-## Optional automation: Make.com or n8n (future work)
-
-A future extension could send structured transcript records to Make.com or n8n for categorization, summarization, storage, or other automation. **This repository currently has no webhook sender and does not connect to either service.** Any integration should be implemented separately, with endpoints and secrets configured securely, and with a privacy review before sending personal watch data to a third party.
+You’ll see progress and retrieved transcript text in the terminal. The complete report is written to `youtube_transcripts_today.md`. Some videos don’t have captions, and YouTube may limit requests. When that happens, the report notes that no transcript was available.
 
 ## The second-brain idea
 
-Imagine being able to ask your AI agent, “What was that video I watched about local AI?” and get an answer from the actual video transcript—not a guess. That’s the goal of the second-brain idea: build a searchable library from the videos you watch, then let your agent use it to answer questions and notice patterns that matter to you.
+I’d like to be able to ask an AI agent about a video I watched last week and get an answer from that video’s transcript, not a plausible-sounding guess. A collection of transcripts can give an agent something concrete to search when you want to remember a detail or find videos you’ve watched about a topic.
 
-The transcript-fetching script in this repository is the first step. The agent integration and custom “YouTube History” skill are not built yet. If your AI agent supports local files and custom skills, give it the prompt below to help set them up.
+This repo doesn’t build that agent integration yet. It fetches and displays transcripts. The prompt below is for an AI agent that can read local files and create skills. Give it to the agent you want to use with your transcripts, then review what it proposes before letting it read or change anything.
 
-### Setup prompt for your AI agent
-
-Copy the text below into the AI agent you want to use with your transcript collection:
+### Prompt for your AI agent
 
 ```text
-I want to create a private, searchable “YouTube History” second brain from my own watch-history and transcript files. Help me set it up as a reusable skill or command in this AI agent, if supported.
+I want to make a private “YouTube History” skill for this AI agent. It should help me search and ask questions about YouTube videos I’ve watched, using the transcripts and history files I choose to provide.
 
-Before doing anything, explain what files you propose to inspect and where you would create the skill or index. Ask me to approve access to my files and creation or modification of files. Do not ask me for passwords, browser cookies, API keys, or webhook secrets.
+Before you access any files or create anything, tell me which files you propose to read and where you would save the skill or any search index. Wait for my approval. Don’t ask me for passwords, browser cookies, API keys, or webhook secrets.
 
-After I approve, use only the history and transcript files I specifically approve to determine what I watched. Do not guess from general knowledge, and do not search the web to fill gaps unless I explicitly ask for outside research. If a transcript is missing, incomplete, or unclear, tell me.
+Once I approve, use only the history and transcript files I approved to determine what I watched. Don’t fill gaps with guesses or silently search the web. If a transcript is missing or unclear, tell me. Keep the video title and URL with each useful answer so I can check the source; include the watch date if the file has one.
 
-Look through the approved records and discover recurring topics, interests, and useful categories from the actual content. Do not force a preset category system. Show me the patterns you found and let me correct them before creating the skill. Ask me how I want subjective labels such as “useful” or “doom-scrolling” defined; do not treat those labels as objective facts.
+Read through the approved material and look for themes and categories that actually fit it. Don’t start with a fixed list of categories. Show me the patterns you notice and let me correct them before you build the skill. Ask me what I mean by subjective labels such as “useful” or “doom-scrolling” instead of deciding for me.
 
-Then create a reusable skill/command, preferably called “YouTube History”, that lets me:
-- Ask what a watched video covered, find videos about a topic, and explore themes in my viewing.
-- Get answers grounded in specific transcripts, with the video title and URL (and watch date/time when available) cited as sources.
-- See when the available transcripts do not contain enough information, instead of receiving a guessed answer.
-- Optionally request viewing-pattern summaries, such as topics or Shorts versus long-form, only when the records contain enough evidence; explain assumptions and uncertainty.
+Then create a reusable skill or command, ideally called “YouTube History”, that can:
+- Find videos I watched about a topic and answer questions from their transcripts.
+- Explain what a particular video covered and help me revisit its ideas.
+- Cite the relevant video title and URL, and say when the available material doesn’t support an answer.
+- If I ask, summarize patterns in my viewing, such as recurring topics or Shorts versus longer videos. Explain what data you used and where the result is uncertain.
 
-Keep the skill and data local/private by default. Do not send them to a webhook, Make.com, n8n, or another cloud service unless I separately approve the exact destination and data to be sent. Do not alter or delete my original history or transcript files.
+For questions about my watch history, use the approved local collection first. Only use outside sources when I explicitly ask for broader research, and keep outside information separate from transcript-based answers. Keep my files and the skill private and local by default. Don’t send anything to a webhook, Make.com, n8n, or another service unless I separately approve exactly what will be sent and where. Don’t change or delete my original history or transcript files.
 
-When done, explain how I invoke the skill, which files you read and created, what the skill can and cannot answer, and whether you used any network access. Do not say setup is complete unless you verified the skill can find and cite entries from my approved transcript collection.
+When you finish, tell me how to use the skill, which files you read or created, what it can and can’t answer, and whether you accessed the network. Don’t say it’s ready until you’ve checked that it can find and cite an item from my approved collection.
 ```
 
-### What the custom skill should help you do
+That prompt is a starting point, not a magic switch. Your agent needs permission to read the transcript files and must support creating a custom skill or command. If your collection is large, it may also need a local search index or another way to find the right transcript quickly.
 
-- **Build itself around your data:** notice recurring topics and create an organization that fits the videos you actually watch, rather than imposing fixed categories.
-- **Ask questions about your viewing:** find relevant videos and answer from their transcripts, citing the source and acknowledging gaps.
-- **Explore viewing habits:** optionally summarize topics, formats, or Shorts versus long-form. Treat subjective labels as your choice and explain any assumptions.
+### What you could use the skill for
 
-This is a guide for an AI agent to perform a setup with your approval—not an automatic feature of the transcript script. The agent may need its own local search/index or knowledge store to make a large transcript collection searchable.
+You might ask, “Which videos I watched talked about local AI?” or “What did that video say about memory?” The agent should point you to the transcript it used and be upfront if the transcript doesn’t answer the question.
 
-## Privacy and security
+If you want, the skill could also look for patterns in your viewing: recurring topics, video formats, or how much of a day’s watch history was Shorts. Those summaries depend on what information your files contain. Labels like “useful” and “doom-scrolling” are personal judgments, so the agent should use your definitions rather than invent its own.
 
-Watch history and transcripts can reveal personal interests. Keep generated files private unless you intentionally choose to share them. `.gitignore` excludes the local history input and transcript output to reduce the chance of accidental publication. Before sending data to an AI service, Make.com, n8n, or GitHub Actions, review what is being sent and how long that service retains it.
+## Make.com and n8n
 
-## GitHub Actions note
+You could extend the project to send transcript data to Make.com or n8n and use those tools to organize or process it. That connection is not implemented here: this repository currently sends no webhooks. Before adding one, decide what data should leave your computer, where it should go, and how its credentials and retention will be handled.
 
-An existing manually triggered workflow accepts the history JSON as a base64 input and uploads its transcript report as a downloadable artifact. That runs in GitHub's cloud environment, not on your local machine. Workflow inputs, logs, and artifacts may be retained; submit watch data only if you are comfortable with that exposure. It does not send a webhook.
+## Privacy
+
+Watch history can be personal. The input file and generated transcript report are ignored by Git to help prevent accidental commits, but still check `git status` before pushing changes. Don’t upload transcripts or history to an AI service, GitHub Actions, Make.com, n8n, or another provider unless you’re comfortable with how that service handles them.
+
+The optional GitHub Actions workflow runs in GitHub’s cloud. It takes the history JSON you provide and makes the transcript report available as an artifact. That is not local-only processing.
 
 ## Tests
 
-Run `python3 -m unittest discover -s tests -v`. The tests mock yt-dlp subprocess execution and do not make live network requests.
+Run:
 
-## Files
+```sh
+python3 -m unittest discover -s tests -v
+```
 
-- `fetch_transcripts.py` — transcript-only fetcher and display/output script
-- `requirements.txt` — yt-dlp dependency
-- `README.md` — overview and quick start
-- `.github/workflows/transcribe.yml` — optional manual Actions workflow
-- `tests/` — offline tests
+The tests mock yt-dlp and don’t make network requests.
 
-No license is specified yet.
+## License
 
-## Local output files
+This repository doesn’t have a license yet.
 
-`youtube_history_today.json` and `youtube_transcripts_today.md` are local input/output files and are intentionally ignored by Git. Do not commit private watch history or transcript data.
+## One privacy caveat
 
----
-
-## Important privacy note
-
-History and transcript files present in previous commits may remain accessible in the public Git history after removal from the current version. Their current-tree removal does not erase prior commits.
+The current version no longer contains the sample history and transcript output, but those files appeared in earlier public commits. Removing them from the latest version does not remove them from Git history. Anyone who may have accessed the repository earlier could still have copies.
